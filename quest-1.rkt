@@ -1,46 +1,41 @@
 #lang racket
 
-(require data/collection)
+(provide part-1
+         part-2)
+
+(struct notes (names steps))
+
+(define (csv in)
+  (string-split in ","))
+
+(define (read-notes file)
+  (call-with-input-file file
+                        (lambda (test-in)
+                          (let ([names-in (read-line test-in)]
+                                [_ (read-line test-in)]
+                                [steps-in (read-line test-in)])
+                            (notes (csv names-in) (csv steps-in))))))
+(define (char-to-integer x)
+  (- (char->integer x) (char->integer #\0)))
+
+(define (clamp-add top x y)
+  (min (+ x y) top))
+
+(define (clamp-sub bot x y)
+  (max (- x y) bot))
 
 (define (part-1 file)
-  ; TODO: Can I avoid having to remember to `close-input-port`?
-  (define test-in (open-input-file file))
-
-  (define names-in (read-line test-in))
-  (define _ (read-line test-in))
-  (define steps-in (read-line test-in))
-
-  (close-input-port test-in)
-
-  (define names (string-split names-in ","))
-  (define steps (string-split steps-in ","))
-
-  (define zero (char->integer #\0))
-
-  (define (read-char x)
-    (- (char->integer x) zero))
-
-  (define (add- top x y)
-    (min (+ x y) top))
-
-  (define (sub- bot x y)
-    (max (- x y) bot))
-
-  (define clamp (- (length names) 1))
-
-  (define idx
-    ; data/collection has accumulator first in lambda
-    ; base:foldl has it last
-    (foldl (lambda (result x)
-             (match (string->list x)
-               [(list #\L amt) (sub- 0 result (read-char amt))]
-               [(list #\R amt) (add- clamp result (read-char amt))]))
-           0
-           steps))
-  (nth names idx))
+  (let* ([my-notes (read-notes file)]
+         [clamp-max (- (length (notes-names my-notes)) 1)]
+         [idx (foldl
+               (lambda (x result)
+                 (match (string->list x)
+                   [(list #\L amt) (clamp-sub 0 result (char-to-integer amt))]
+                   [(list #\R amt)
+                    (clamp-add clamp-max result (char-to-integer amt))]))
+               0
+               (notes-steps my-notes))])
+    (list-ref (notes-names my-notes) idx)))
 
 (define (part-2 _file)
   "TODO")
-
-(provide part-1
-         part-2)
