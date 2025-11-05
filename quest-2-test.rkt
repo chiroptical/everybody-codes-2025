@@ -31,3 +31,10 @@
 (check-equal? (complex-div j k) (complex-num 3 2) "complex-div example")
 (check-equal? (complex-div l b) (complex-num -5 -6) "complex-div example")
 (check-equal? (complex-div m k) (complex-num -3 -2) "complex-div example")
+
+(check-equal? (part-1 (complex-num 25 9))
+              (complex-num 357 862)
+              "part 1 example")
+(check-equal? (part-1 (complex-num 166 51))
+              (complex-num 404104 928207)
+              "part 1 test")

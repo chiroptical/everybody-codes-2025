@@ -3,7 +3,8 @@
 (provide complex-num
          complex-add
          complex-mul
-         complex-div)
+         complex-div
+         part-1)
 
 (struct complex-num (x y) #:transparent)
 
@@ -21,3 +22,19 @@
   (match (list x y)
     [(list (complex-num x1 y1) (complex-num x2 y2))
      (complex-num (quotient x1 x2) (quotient y1 y2))]))
+
+(define (part-1 a)
+  (foldl (lambda (_x acc)
+           (let* ([first (complex-mul acc acc)]
+                  [second (complex-div first (complex-num 10 10))])
+             (complex-add second a)))
+         (complex-num 0 0)
+         (list 1 2 3)))
+
+(define (display-complex-num x)
+  (match x
+    [(complex-num x y)
+     (string-append "[" (number->string x) "," (number->string y) "]")]))
+
+(display-complex-num (part-1 (complex-num 25 9)))
+(display-complex-num (part-1 (complex-num 166 51)))
