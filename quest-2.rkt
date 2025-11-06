@@ -6,6 +6,7 @@
          complex-div
          part-1)
 
+; TODO: We could just model this with built-in rationals, e.g. 1/2
 (struct complex-num (x y) #:transparent)
 
 (define (complex-add x y)
