@@ -3,10 +3,9 @@
 (provide part-1
          part-2)
 
-(struct notes (names steps))
+(require "util.rkt")
 
-(define (csv in)
-  (string-split in ","))
+(struct notes (names steps))
 
 (define (read-notes file)
   (call-with-input-file file
