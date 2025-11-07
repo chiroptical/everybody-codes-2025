@@ -14,6 +14,7 @@
                                 [_ (read-line test-in)]
                                 [steps-in (read-line test-in)])
                             (notes (csv names-in) (csv steps-in))))))
+
 (define (char-to-integer x)
   (- (char->integer x) (char->integer #\0)))
 
