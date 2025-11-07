@@ -37,5 +37,16 @@
                (notes-steps my-notes))])
     (list-ref (notes-names my-notes) idx)))
 
-(define (part-2 _file)
-  "TODO")
+(define (part-2 file)
+  (let* ([my-notes (read-notes file)]
+         [clamp-max (length (notes-names my-notes))]
+         [rotate-with (lambda (f r amt)
+                        (modulo (f r (string->number (list->string amt)))
+                                clamp-max))]
+         [idx (foldl (lambda (x result)
+                       (match (string->list x)
+                         [(cons #\L amt) (rotate-with - result amt)]
+                         [(cons #\R amt) (rotate-with + result amt)]))
+                     0
+                     (notes-steps my-notes))])
+    (list-ref (notes-names my-notes) idx)))
