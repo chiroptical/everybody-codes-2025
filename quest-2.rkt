@@ -6,13 +6,14 @@
          complex-div
          part-1)
 
-; TODO: We could just model this with built-in rationals, e.g. 1/2
+; We can't use built in rationals because the sign matters,
+; e.g. (numerator (10 / -1)) yields -10 but our addition
+; operator needs it to return 10.
 (struct complex-num (x y) #:transparent)
 
 (define (complex-add x y)
   (match (list x y)
-    [(list (complex-num x1 y1) (complex-num x2 y2))
-     (complex-num (+ x1 x2) (+ y1 y2))]))
+    [(list (complex-num x1 y1) (complex-num x2 y2)) (complex-num (+ x1 x2) (+ y1 y2))]))
 
 (define (complex-mul x y)
   (match (list x y)
@@ -21,8 +22,7 @@
 
 (define (complex-div x y)
   (match (list x y)
-    [(list (complex-num x1 y1) (complex-num x2 y2))
-     (complex-num (quotient x1 x2) (quotient y1 y2))]))
+    [(list (complex-num x1 y1) (complex-num x2 y2)) (complex-num (quotient x1 x2) (quotient y1 y2))]))
 
 (define (part-1 a)
   (foldl (lambda (_x acc)
@@ -34,8 +34,7 @@
 
 (define (display-complex-num x)
   (match x
-    [(complex-num x y)
-     (string-append "[" (number->string x) "," (number->string y) "]")]))
+    [(complex-num x y) (string-append "[" (number->string x) "," (number->string y) "]")]))
 
 (display-complex-num (part-1 (complex-num 25 9)))
 (display-complex-num (part-1 (complex-num 166 51)))
