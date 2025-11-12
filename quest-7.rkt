@@ -4,7 +4,8 @@
          rule
          parse-rule
          part-1
-         is-success?)
+         is-success?
+         search-for-failure)
 
 (require "util.rkt")
 
@@ -32,25 +33,23 @@
 (define (get-indexes hay nee)
   (indexes-of (string->list hay) (first (string->list nee))))
 
+(define (search-for-failure l indexes chars)
+  (ormap
+   (lambda (idx)
+     (let ([follower-char (list-ref-default (string->list l) (+ idx 1) #f)])
+       (match follower-char
+         [#f #f]
+         [_
+          (andmap (lambda (c)
+                    (not (char=? (first (string->list c)) follower-char)))
+                  chars)])))
+   indexes))
+
 (define (is-success? l r)
   (match r
     [(rule fst rest)
-     (ormap (lambda (good-char)
-              (let* ([indexes (get-indexes l fst)]
-                     [c (first (string->list good-char))]
-                     ; if any of those chars are in x
-                     )
-                (if (empty? indexes)
-                    #t
-                    (ormap (lambda (x)
-                             (let ([post (list-ref-default (string->list l)
-                                                           (+ x 1)
-                                                           #f)])
-                               (match post
-                                 [#f #f]
-                                 [_ (char=? post c)])))
-                           indexes))))
-            rest)]))
+     (let* ([indexes (get-indexes l fst)])
+       (not (search-for-failure l indexes rest)))]))
 
 (define (part-1 file)
   (let* ([my-notes (read-notes file)]
