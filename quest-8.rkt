@@ -65,9 +65,12 @@
          [new-state (foldl next-state (state (list) 0) vecs)])
     (state-knots new-state)))
 
-(struct drop-state (idx lst))
-
+; TODO: Should probably put this in utils with a contract,
+; - (> idx 0)
+; - lst is non-empty
+; - idx is not greater than length of list
 (define (drop-at lst idx)
+  (struct drop-state (idx lst))
   (let ([st (foldl (lambda (x st)
                      (let ([curr (drop-state-idx st)]
                            [ls (drop-state-lst st)])
@@ -83,7 +86,7 @@
           (for/list ([i (range (length perms))])
             (let* ([vec (list-ref perms i)]
                    [rest (drop-at perms i)]
-                   [st (next-state vec (state rest 0))])
+                   [st (next-state vec (state rest 1))])
               (state-knots st)))))
 
 (define (part-3 file)

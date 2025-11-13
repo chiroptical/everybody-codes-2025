@@ -26,5 +26,6 @@
 
 (check-equal? (drop-at (list 1 2 3) 1) (list 1 3) "...")
 
-; TODO: This should be 7
-(check-equal? (part-3 "inputs/quest-8-test-3.txt") 6 "part 3 test")
+(check-equal? (part-3 "inputs/quest-8-test-3.txt") 7 "part 3 test")
+; TODO: This is slow, the value 2786 is wrong
+; (check-equal? (part-3 "inputs/quest-8-3.txt") 2786 "part 3")
