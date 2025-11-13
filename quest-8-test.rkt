@@ -23,3 +23,8 @@
 
 (check-equal? (part-2 "inputs/quest-8-test-2.txt") 21 "part 2 test")
 (check-equal? (part-2 "inputs/quest-8-2.txt") 2925920 "part 2")
+
+(check-equal? (drop-at (list 1 2 3) 1) (list 1 3) "...")
+
+; TODO: This should be 7
+(check-equal? (part-3 "inputs/quest-8-test-3.txt") 6 "part 3 test")

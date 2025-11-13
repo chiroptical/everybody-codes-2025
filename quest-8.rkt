@@ -2,8 +2,10 @@
 
 (provide part-1
          part-2
+         part-3
          overlaps?
-         vec)
+         vec
+         drop-at)
 
 (require "util.rkt")
 
@@ -62,3 +64,29 @@
          [vecs (map make-vecs (windows 2 1 notes))]
          [new-state (foldl next-state (state (list) 0) vecs)])
     (state-knots new-state)))
+
+(struct drop-state (idx lst))
+
+(define (drop-at lst idx)
+  (let ([st (foldl (lambda (x st)
+                     (let ([curr (drop-state-idx st)]
+                           [ls (drop-state-lst st)])
+                       (if (= curr idx)
+                           (drop-state (+ curr 1) ls)
+                           (drop-state (+ curr 1) (append ls (list x))))))
+                   (drop-state 0 (list))
+                   lst)])
+    (drop-state-lst st)))
+
+(define (solve perms)
+  (argmax identity
+          (for/list ([i (range (length perms))])
+            (let* ([vec (list-ref perms i)]
+                   [rest (drop-at perms i)]
+                   [st (next-state vec (state rest 0))])
+              (state-knots st)))))
+
+(define (part-3 file)
+  (let* ([notes (read-notes file)]
+         [vecs (map make-vecs (windows 2 1 notes))])
+    (solve vecs)))
