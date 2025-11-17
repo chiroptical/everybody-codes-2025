@@ -9,10 +9,8 @@
 ; That way parents and children have numbers. There is probably a much better
 ; representation of data here.
 ; For example, if you get all the keys you can form all the possible
-; parent child relationships and process those in parallel.
-; If a parent child relationship couldn't be formed it becomes 1
-; otherwise it becomes the number of matches. That can be done in parallel.
-; Finally, multiply all those together
+; parent combinations. Then, for each parent combination look for valid children.
+; That task can be completed in parallel.
 (define (get-sequence ln)
   (let ([parts (string-split ln ":")])
     (match parts
