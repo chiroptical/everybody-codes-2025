@@ -39,7 +39,8 @@
                     [(list hd tl) (hash-set acc (string->number hd) tl)]))]
          [potential-parents (combinations (hash-keys ducks) 2)]
          [futures (for/list ([parents potential-parents])
-                    (future (thunk (get-parent-child-relationships parents ducks))))])
+                    (future (thunk (get-parent-child-relationships parents
+                                                                   ducks))))])
     (for/fold ([acc 0]) ([fut futures])
       (+ acc (foldl + 0 (touch fut))))))
 
