@@ -1,6 +1,7 @@
 #lang racket
 
-(provide part-1)
+(provide part-1
+         part-1-serial)
 
 (define (analyze-genome dad mom child)
   (for/fold ([acc (list 0 0)])
@@ -32,6 +33,17 @@
         [(list d m) (cons (* d m) acc)]))))
 
 (define (part-1 filename)
+  (let* ([lines (file->lines filename)]
+         [ducks (for/fold ([acc (make-immutable-hash)]) ([duck lines])
+                  (match (string-split duck ":")
+                    [(list hd tl) (hash-set acc (string->number hd) tl)]))]
+         [potential-parents (combinations (hash-keys ducks) 2)]
+         [futures (for/list ([parents potential-parents])
+                    (future (thunk (get-parent-child-relationships parents ducks))))])
+    (for/fold ([acc 0]) ([fut futures])
+      (+ acc (foldl + 0 (touch fut))))))
+
+(define (part-1-serial filename)
   (let* ([lines (file->lines filename)]
          [ducks (for/fold ([acc (make-immutable-hash)]) ([duck lines])
                   (match (string-split duck ":")
