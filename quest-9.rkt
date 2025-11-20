@@ -2,76 +2,41 @@
 
 (provide part-1)
 
-(struct duck-seq (x y z))
+(define (analyze-genome dad mom child)
+  (for/fold ([acc (list 0 0)])
+            ([d dad]
+             [m mom]
+             [c child]
+             #:break (match acc
+                       [#f #t]
+                       [_ #f]))
+    (let ([dad-match (char=? d c)]
+          [mom-match (char=? m c)]
+          [curr-dad (first acc)]
+          [curr-mom (second acc)])
+      (match (list dad-match mom-match)
+        [(list #t #t) (list (+ curr-dad 1) (+ curr-mom 1))]
+        [(list #t #f) (list (+ curr-dad 1) curr-mom)]
+        [(list #f #t) (list curr-dad (+ curr-mom 1))]
+        [(list #f #f) #f]))))
 
-; TODO: This solution really sucks
-; It would probably be better to have a dictionary of `number -> sequence`
-; That way parents and children have numbers. There is probably a much better
-; representation of data here.
-; For example, if you get all the keys you can form all the possible
-; parent combinations. Then, for each parent combination look for valid children.
-; That task can be completed in parallel.
-(define (get-sequence ln)
-  (let ([parts (string-split ln ":")])
-    (match parts
-      [(list _hd ... tl) tl])))
+(define (get-parent-child-relationships parents ducks)
+  (let* ([dad (first parents)]
+         [dad-genome (hash-ref ducks dad)]
+         [mom (second parents)]
+         [mom-genome (hash-ref ducks mom)]
+         [ducks-no-parents (hash-remove (hash-remove ducks dad) mom)])
+    (for/fold ([acc (list)]) ([child-genome (hash-values ducks-no-parents)])
+      (match (analyze-genome dad-genome mom-genome child-genome)
+        [#f (cons 0 acc)]
+        [(list d m) (cons (* d m) acc)]))))
 
-(define (read-notes file)
-  (call-with-input-file
-   file
-   (lambda (test-in)
-     (let ([x (read-line test-in)]
-           [y (read-line test-in)]
-           [z (read-line test-in)])
-       (duck-seq (get-sequence x) (get-sequence y) (get-sequence z))))))
-
-(define (get-matches s x y z)
-  (let* ([xy (if (char=? x y)
-                 (set 'x 'y)
-                 (set))]
-         [xz (if (char=? x z)
-                 (set 'x 'z)
-                 (set))]
-         [yz (if (char=? y z)
-                 (set 'y 'z)
-                 (set))])
-    (set-intersect s (set-union xy xz yz))))
-
-(define (determine-child ducks)
-  (for/fold ([children (set 'x 'y 'z)])
-            ([x (duck-seq-x ducks)]
-             [y (duck-seq-y ducks)]
-             [z (duck-seq-z ducks)]
-             #:break (= 1 (set-count children)))
-    (match children
-      [s (get-matches s x y z)])))
-
-(define (determine-matches ducks parent)
-  (let*-values ([(child p1 p2)
-                 (match parent
-                   ['x (values duck-seq-x duck-seq-y duck-seq-z)]
-                   ['y (values duck-seq-y duck-seq-x duck-seq-z)]
-                   ['z (values duck-seq-z duck-seq-x duck-seq-y)])]
-                [(childs p1s p2s) (values (child ducks) (p1 ducks) (p2 ducks))])
-    (for/fold ([acc (list 0 0)])
-              ([c childs]
-               [o p1s]
-               [t p2s])
-      (match acc
-        [(list a b)
-         #:when (and (char=? c o) (char=? c t))
-         (list (+ 1 a) (+ 1 b))]
-        [(list a b)
-         #:when (char=? c o)
-         (list (+ 1 a) b)]
-        [(list a b)
-         #:when (char=? c t)
-         (list a (+ 1 b))]
-        [_ acc]))))
-
-(define (part-1 file)
-  (let* ([ducks (read-notes file)]
-         [child (set-first (determine-child ducks))]
-         [matches (determine-matches ducks child)])
-    (match matches
-      [(list x y) (* x y)])))
+(define (part-1 filename)
+  (let* ([lines (file->lines filename)]
+         [ducks (for/fold ([acc (make-immutable-hash)]) ([duck lines])
+                  (match (string-split duck ":")
+                    [(list hd tl) (hash-set acc (string->number hd) tl)]))]
+         [potential-parents (combinations (hash-keys ducks) 2)])
+    (for/fold ([acc 0]) ([parents potential-parents])
+      (let ([relationships (get-parent-child-relationships parents ducks)])
+        (+ acc (foldl + 0 relationships))))))
