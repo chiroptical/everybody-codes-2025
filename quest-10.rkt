@@ -3,23 +3,82 @@
 (provide part-1)
 
 (define (process-line row ln)
-  (for/fold ([acc (set)])
+  (for/fold ([sheep-set (set)]
+             [dragon-set (set)]
+             [_ 0])
             ([c ln]
              [col (in-naturals)])
     (match c
-      [#\S (set-add acc (point row col))]
-      [_ acc])))
+      [#\S
+       (let ([new-sheep (set-add sheep-set (point row col))])
+         (values new-sheep dragon-set col))]
+      [#\D
+       (let ([new-dragon (set-add dragon-set (point row col))])
+         (values dragon-set new-dragon col))]
+      [_ (values sheep-set dragon-set col)])))
+
+(struct state (sheep dragon max-dims) #:transparent)
+
+(define (make-initial-state)
+  (state (set) (set) (point 0 0)))
 
 (struct point (r c) #:transparent)
 
 (define (read-notes file)
   (let* ([lines (file->lines file)]
-         [sheep (for/fold ([acc (set)])
-                          ([ln lines]
-                           [idx (in-naturals)])
-                  (let ([new-points (process-line idx ln)])
-                    (set-union acc new-points)))])
-    sheep))
+         [initial-state (for/fold ([st (make-initial-state)])
+                                  ([ln lines]
+                                   [idx (in-naturals)])
+                          (let ([curr-sheep (state-sheep st)]
+                                [curr-dragon (state-dragon st)])
+                            (let-values ([(new-sheep new-dragon max-col)
+                                          (process-line idx ln)])
+                              (state (set-union curr-sheep new-sheep)
+                                     (set-union curr-dragon new-dragon)
+                                     (point idx max-col)))))])
+    initial-state))
 
-(define (part-1 file)
-  (read-notes file))
+(define knights-moves
+  (list (point -2 1)
+        (point -2 -1)
+        (point -1 2)
+        (point -1 -2)
+        (point 1 2)
+        (point 1 -2)
+        (point 2 1)
+        (point 2 -1)))
+
+(define (valid-move start move max-dims)
+  (let* ([start-r (point-r start)]
+         [start-c (point-c start)]
+         [move-r (point-r move)]
+         [move-c (point-c move)]
+         [max-r (point-r max-dims)]
+         [max-c (point-c max-dims)]
+         [final (point (+ start-r move-r) (+ start-c move-c))])
+    (match final
+      [(point r c)
+       #:when (or (> r max-r) (> c max-c) (< r 0) (< c 0))
+       #f]
+      [_ final])))
+
+(define (make-moves start max-dims)
+  (for/fold ([acc (set)]) ([move knights-moves])
+    (match (valid-move start move max-dims)
+      [#f acc]
+      [p (set-add acc p)])))
+
+(define (part-1 file n)
+  (let* ([initial-state (read-notes file)]
+         [max-dims (state-max-dims initial-state)]
+         [sheep (state-sheep initial-state)]
+         [init-dragons (state-dragon initial-state)]
+         [final-dragons (for/fold ([acc init-dragons]) ([_ (range n)])
+                          (foldl (lambda (dragon final)
+                                   (set-union (make-moves dragon max-dims)
+                                              final))
+                                 acc
+                                 (set->list acc)))]
+         [intersection (set-intersect sheep final-dragons)]
+         [result (set-count intersection)])
+    result))
