@@ -63,7 +63,7 @@
       [_ final])))
 
 (define (make-moves start max-dims)
-  (for/fold ([acc (set)]) ([move knights-moves])
+  (for/fold ([acc (set start)]) ([move knights-moves])
     (match (valid-move start move max-dims)
       [#f acc]
       [p (set-add acc p)])))
