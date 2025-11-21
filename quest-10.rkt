@@ -73,6 +73,7 @@
          [max-dims (state-max-dims initial-state)]
          [sheep (state-sheep initial-state)]
          [init-dragons (state-dragon initial-state)]
+         ; TODO: plot final dragons and see what is missing
          [final-dragons (for/fold ([acc init-dragons]) ([_ (range n)])
                           (foldl (lambda (dragon final)
                                    (set-union (make-moves dragon max-dims)
