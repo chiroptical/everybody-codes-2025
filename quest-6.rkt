@@ -2,8 +2,6 @@
 
 (provide part-1
          part-2
-         sized
-         sized-append
          part-3)
 
 (struct state (mentors pairs))

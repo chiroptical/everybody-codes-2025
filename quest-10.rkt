@@ -1,7 +1,6 @@
 #lang racket
 
-(provide part-1
-         render-mat)
+(provide part-1)
 
 (define (process-line row ln)
   (for/fold ([sheep-set (set)]
@@ -83,14 +82,3 @@
                                  (set->list acc)))]
          [intersection (set-intersect sheep final-dragons)])
     (set-count intersection)))
-
-(define (render-mat mat dims)
-  (match dims
-    [(point rows cols)
-     (for* ([r rows]
-            [c cols])
-       (let ([display-char (if (set-member? mat (point r c)) #\X #\.)])
-         (display display-char)
-         (if (= c (- cols 1))
-             (display "\n")
-             #f)))]))
