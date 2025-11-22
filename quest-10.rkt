@@ -1,6 +1,7 @@
 #lang racket
 
-(provide part-1)
+(provide part-1
+         render-mat)
 
 (define (process-line row ln)
   (for/fold ([sheep-set (set)]
@@ -14,7 +15,7 @@
          (values new-sheep dragon-set col))]
       [#\D
        (let ([new-dragon (set-add dragon-set (point row col))])
-         (values dragon-set new-dragon col))]
+         (values sheep-set new-dragon col))]
       [_ (values sheep-set dragon-set col)])))
 
 (struct state (sheep dragon max-dims) #:transparent)
@@ -80,6 +81,16 @@
                                               final))
                                  acc
                                  (set->list acc)))]
-         [intersection (set-intersect sheep final-dragons)]
-         [result (set-count intersection)])
-    result))
+         [intersection (set-intersect sheep final-dragons)])
+    (set-count intersection)))
+
+(define (render-mat mat dims)
+  (match dims
+    [(point rows cols)
+     (for* ([r rows]
+            [c cols])
+       (let ([display-char (if (set-member? mat (point r c)) #\X #\.)])
+         (display display-char)
+         (if (= c (- cols 1))
+             (display "\n")
+             #f)))]))
