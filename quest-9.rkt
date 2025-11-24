@@ -68,22 +68,25 @@
 
   (define/match (get-input _size)
     [('small) "inputs/quest-9-test.txt"]
-    [('medium) "inputs/quest-9.txt"]
     [('large) "inputs/quest-9-2.txt"])
 
   (define benchmark-results
-    (run-benchmarks (list 'small 'medium 'large)
+    (run-benchmarks (list 'small 'large)
                     (list (list 'serial 'parallel))
                     (lambda (size impl)
                       (let ([fn (match impl
                                   ['serial part-1-serial]
                                   ['parallel part-1])])
                         (fn (get-input size))))
-                    #:num-trials 10
+                    #:num-trials 30
                     #:extract-time 'delta-time))
 
   (define renderer
     ; Here, 'serial becomes the baseline
     (render-benchmark-alts (list 'serial) benchmark-results))
 
-  (plot renderer #:out-file "quest-9.png"))
+  (parameterize ([plot-x-ticks no-ticks])
+    (plot renderer
+          #:out-file "quest-9.png"
+          #:x-label "input size"
+          #:y-label "normalized time")))
