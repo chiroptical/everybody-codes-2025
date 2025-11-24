@@ -53,3 +53,11 @@
     (for/fold ([acc 0]) ([parents potential-parents])
       (let ([relationships (get-parent-child-relationships parents ducks)])
         (+ acc (foldl + 0 relationships))))))
+
+(module+ test
+  (require rackunit)
+
+  (check-equal? (part-1 "inputs/quest-9-test.txt") 414 "part 1 test")
+  (check-equal? (part-1 "inputs/quest-9.txt") 7120 "part 1")
+
+  (check-equal? (part-1 "inputs/quest-9-2.txt") 317641 "part 2"))

@@ -50,3 +50,16 @@
                      0
                      (notes-steps my-notes))])
     (list-ref (notes-names my-notes) idx)))
+
+(module+ test
+  (require rackunit)
+
+  (check-equal? (part-1 "inputs/quest-1-test.txt") "Fyrryn" "Part 1 test input")
+  (check-equal? (part-1 "inputs/quest-1.txt") "Caelzar" "Part 1 input")
+
+  (check-equal? (part-2 "inputs/quest-1-test.txt")
+                "Elarzris"
+                "Part 2 test input")
+  (check-equal? (part-2 "inputs/quest-1-part-2.txt")
+                "Thyroszar"
+                "Part 2 test input"))

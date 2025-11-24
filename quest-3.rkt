@@ -13,3 +13,9 @@
                                            (csv crates-txt))))]
          [crates-set (list->set crates)])
     (foldl (lambda (result x) (+ result (string->number x))) 0 crates-set)))
+
+(module+ test
+  (require rackunit)
+
+  (check-equal? (part-1 "inputs/quest-3-test.txt") 29 "Part 1 test input")
+  (check-equal? (part-1 "inputs/quest-3.txt") 3001 "Part 1 input"))

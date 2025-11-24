@@ -82,3 +82,10 @@
                                  (set->list acc)))]
          [intersection (set-intersect sheep final-dragons)])
     (set-count intersection)))
+
+(module+ test
+  (require rackunit)
+
+  ; (check-equal? (part-1 "inputs/quest-10-test.txt" 3) 26 "Part 1 test input")
+
+  (check-equal? (part-1 "inputs/quest-10.txt" 4) 145 "Part 1 input"))
