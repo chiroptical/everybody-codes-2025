@@ -61,3 +61,29 @@
   (check-equal? (part-1 "inputs/quest-9.txt") 7120 "part 1")
 
   (check-equal? (part-1 "inputs/quest-9-2.txt") 317641 "part 2"))
+
+(module+ main
+  (require benchmark)
+  (require plot)
+
+  (define/match (get-input _size)
+    [('small) "inputs/quest-9-test.txt"]
+    [('medium) "inputs/quest-9.txt"]
+    [('large) "inputs/quest-9-2.txt"])
+
+  (define benchmark-results
+    (run-benchmarks (list 'small 'medium 'large)
+                    (list (list 'serial 'parallel))
+                    (lambda (size impl)
+                      (let ([fn (match impl
+                                  ['serial part-1-serial]
+                                  ['parallel part-1])])
+                        (fn (get-input size))))
+                    #:num-trials 10
+                    #:extract-time 'delta-time))
+
+  (define renderer
+    ; Here, 'serial becomes the baseline
+    (render-benchmark-alts (list 'serial) benchmark-results))
+
+  (plot renderer #:out-file "quest-9.png"))
